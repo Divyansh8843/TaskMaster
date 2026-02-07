@@ -91,4 +91,49 @@ npm run dev
 | `GET` | `/api/protected` | Example protected data | Yes |
 
 ---
+
+## 🚀 Deployment Guide
+
+### 1. Google Cloud Console Setup (Critical)
+To ensure the app works in production, update your Google Cloud Console Credentials:
+1.  Go to **APIs & Services > Credentials**.
+2.  Edit your **OAuth 2.0 Client ID**.
+3.  **Authorized JavaScript Origins**:
+    *   `http://localhost:5173`
+    *   `https://[YOUR_VERCEL_PROJECT].vercel.app` (Add your actual Vercel domain)
+4.  **Authorized Redirect URIs**:
+    *   `http://localhost:5173`
+    *   `https://[YOUR_VERCEL_PROJECT].vercel.app`
+
+### 2. Deploy Backend (Render)
+1.  Push code to GitHub.
+2.  Create a **Web Service** on Render connected to your repo.
+3.  **Root Directory**: `backend`
+4.  **Build Command**: `npm install && npm run build`
+5.  **Start Command**: `npm start`
+6.  **Environment Variables**:
+    *   `NODE_ENV`: `production`
+    *   `CLIENT_URL`: `https://[YOUR_VERCEL_PROJECT].vercel.app`
+    *   `MONGO_URI`: (Your MongoDB connection string)
+    *   `GOOGLE_CLIENT_ID`: (From Google Console)
+    *   `GOOGLE_CLIENT_SECRET`: (From Google Console)
+    *   `JWT_SECRET`: (Random strong string)
+    *   `JWT_REFRESH_SECRET`: (Random strong string)
+
+### 3. Deploy Frontend (Vercel)
+1.  Import your GitHub repo to Vercel.
+2.  **Root Directory**: `frontend`
+3.  **Framework Preset**: Vite
+4.  **Environment Variables**:
+    *   `VITE_GOOGLE_CLIENT_ID`: (Same as backend)
+    *   `VITE_API_URL`: `https://[YOUR_RENDER_SERVICE].onrender.com/api`
+5.  **Deploy**.
+
+### 4. Verification
+*   Open your Vercel URL.
+*   Login with Google.
+*   Check if your Profile Image loads (We use `referrerPolicy="no-referrer"` to ensure this).
+*   Refresh the page to verify the session persists.
+
+---
 **Developed for the Secure OAuth2 Assignment.**
