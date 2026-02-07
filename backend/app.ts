@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import database from './config/db';
 import authRoutes from './routes/authRoutes';
 import helmet from 'helmet';
+import path from 'path';
 
 console.log('Server initializing...');
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use(express.static(path.join(__dirname, "../public")));
 
 // Protected Route Example
 import { protect } from './middlewares/authMiddleware';
