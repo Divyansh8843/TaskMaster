@@ -4,16 +4,22 @@ import { BrowserRouter } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from 'react-hot-toast';
+
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <ThemeProvider>
         <AuthProvider>
-          <App />
+          <BrowserRouter>
+            <App />
+            <Toaster position="top-right" />
+          </BrowserRouter>
         </AuthProvider>
-      </GoogleOAuthProvider>
-    </BrowserRouter>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 )

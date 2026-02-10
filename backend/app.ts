@@ -4,10 +4,12 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import database from './config/db';
 import authRoutes from './routes/authRoutes';
+import taskRoutes from './routes/taskRoutes';
+
 import helmet from 'helmet';
 import path from 'path';
 
-console.log('Server initializing...');
+console.log('Server initializing... (restart)');
 
 
 database();
@@ -18,7 +20,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Frontend URL
+    origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
 }));
 app.use(helmet({
@@ -30,12 +32,10 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use(express.static(path.join(__dirname, "../public")));
+app.use('/api/tasks', taskRoutes);
 
-// Protected Route Example
-import { protect } from './middlewares/authMiddleware';
-app.get('/api/protected', protect, (req, res) => {
-    res.json({ message: 'This is a protected route', user: (req as any).user });
-});
+
+
+
 
 export default app;

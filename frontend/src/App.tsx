@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import { useAuth } from './context/AuthContext';
-
+import Register from './pages/Register';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import Loading from './components/Loading';
@@ -21,11 +22,21 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
       <Route 
         path="/dashboard" 
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } 
       />

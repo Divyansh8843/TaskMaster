@@ -3,6 +3,8 @@ import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+
 
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
@@ -105,3 +107,80 @@ export const getProfile = async (req: Request, res: Response) => {
     if(!user) return res.status(404).json({message: 'User not found'});
     res.json(user);
 };
+
+export const register = async (req: Request, res: Response) => {
+    try {
+        const { email, password, name } = req.body;
+        
+        const existingUser = await User.findOne({ email });
+        if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const result = await User.create({ 
+            email, 
+            password: hashedPassword, 
+            name 
+        });
+
+        const accessToken = generateAccessToken(result);
+        const refreshToken = generateRefreshToken(result);
+
+        res.cookie('jwt', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(201).json({ 
+            accessToken, 
+            user: {
+                id: result._id,
+                email: result.email,
+                name: result.name,
+                roles: result.roles
+            } 
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+};
+
+export const login = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (!existingUser) return res.status(404).json({ message: 'User doesn\'t exist' });
+
+        if (!existingUser.password) return res.status(400).json({ message: 'User created securely via Google. Please login with Google.' });
+
+        const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
+        if (!isPasswordCorrect) return res.status(400).json({ message: 'Invalid credentials' });
+
+        const accessToken = generateAccessToken(existingUser);
+        const refreshToken = generateRefreshToken(existingUser);
+
+        res.cookie('jwt', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.json({ 
+            accessToken, 
+            user: {
+                id: existingUser._id,
+                email: existingUser.email,
+                name: existingUser.name,
+                picture: existingUser.picture,
+                roles: existingUser.roles
+            } 
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+};
+
