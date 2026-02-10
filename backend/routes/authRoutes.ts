@@ -13,7 +13,7 @@ router.post('/login', login);
 router.post('/refresh', refresh);
 router.post('/logout', logout);
 router.get('/profile', protect, getProfile);
-router.get('/admin', protect, admin, (req, res) => {
+router.get('/admin', protect, admin, (req: express.Request, res: express.Response) => {
     res.json({ message: 'Admin access granted' });
 });
 
