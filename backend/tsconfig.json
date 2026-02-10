@@ -6,6 +6,9 @@
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "types": ["node", "express", "jsonwebtoken", "cors", "cookie-parser"],
     "strict": true,
     "skipLibCheck": true
   }
